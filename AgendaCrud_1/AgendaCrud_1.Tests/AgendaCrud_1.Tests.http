@@ -1,6 +1,0 @@
-@AgendaCrud_1.Tests_HostAddress = http://localhost:5042
-
-GET {{AgendaCrud_1.Tests_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

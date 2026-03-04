@@ -1,1 +1,0 @@
-C:\Users\diogo\OneDrive\Desktop\AgendaCRUD\AgendaCrud_1\AgendaCrud_1\obj\Debug\net10.0\staticwebassets.build.json
