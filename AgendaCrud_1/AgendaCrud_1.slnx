@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="AgendaCrud_1.Tests/AgendaCrud_1.Tests.csproj" Id="c3a833be-c73b-443f-ae4a-26899e21af64" />
+  <Project Path="AgendaCrud_1/AgendaCrud_1.csproj" />
+</Solution>
