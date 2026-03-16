@@ -14,7 +14,8 @@
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-  background-color: #f4f6f8;
+  background-color: #fdf5e6;
+  color: black;
 }
 
 .layout {
@@ -24,8 +25,8 @@ body {
 }
 
 .header {
-  background-color: #1e293b;
-  color: white;
+  background-color: #5b048d;
+  color: rgb(255, 255, 255);
   padding: 20px;
   text-align: center;
 }

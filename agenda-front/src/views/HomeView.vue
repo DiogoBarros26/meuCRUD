@@ -1,196 +1,168 @@
 <script setup>
+
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
-const API_URL = 'https://localhost:7061/api/contacts'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
 
 const contatos = ref([])
+const editandoId = ref(null)
 const novoNome = ref('')
 const novoEmail = ref('')
 const novoPhone = ref('')
-const contatoEditando = ref(null)
 
-const buscarContatos = async () => {
-  try {
-    const response = await axios.get(API_URL)
-    contatos.value = response.data
-  } catch (error) {
-    console.error('Erro ao buscar contatos:', error)
-  }
+const API = "https://localhost:7061/api/Contacts"
+
+async function buscarContatos() {
+  const response = await axios.get(API)
+  contatos.value = response.data
 }
 
-const criarContato = async () => {
-  try {
-    await axios.post(API_URL, {
-  name: novoNome.value,
-  email: novoEmail.value,
-  phone: novoPhone.value
-    })
+async function criarContato() {
 
-    novoEmail.value = ''
-    novoNome.value = ''
-    novoPhone.value = ''
+  if (editandoId.value) {
 
-    await buscarContatos()
-  } catch (error) {
-    console.error('Erro ao criar contato:', error)
-  }
-}
-
-const deletarContato = async (id) => {
-  try {
-    await axios.delete(`${API_URL}/${id}`)
-    await buscarContatos()
-  } catch (error) {
-    console.error('Erro ao deletar:', error)
-  }
-}
-
-const atualizarContato = async () => {
-  try {
-    await axios.put(`${API_URL}/${contatoEditando.value.id}`, {
-      id: contatoEditando.value.id,
+    await axios.put(`${API}/${editandoId.value}`, {
+      id: editandoId.value,
       name: novoNome.value,
       email: novoEmail.value,
       phone: novoPhone.value
     })
 
-    contatoEditando.value = null
-    novoNome.value = ''
-    novoEmail.value = ''
-    novoPhone.value = ''
+  } else {
 
-    await buscarContatos()
-  } catch (error) {
-    console.error('Erro ao atualizar:', error)
+    await axios.post(API, {
+      name: novoNome.value,
+      email: novoEmail.value,
+      phone: novoPhone.value
+    })
+
   }
+
+  novoNome.value = ''
+  novoEmail.value = ''
+  novoPhone.value = ''
+  editandoId.value = null
+
+  buscarContatos()
 }
-const editarContato = (contato) => {
-  contatoEditando.value = contato
+
+async function deletarContato(id) {
+  await axios.delete(`${API}/${id}`)
+  buscarContatos()
+}
+
+function editarContato(contato) {
   novoNome.value = contato.name
   novoEmail.value = contato.email
   novoPhone.value = contato.phone
 
+  editandoId.value = contato.id
 }
 
 onMounted(() => {
   buscarContatos()
 })
+
 </script>
 
 <template>
-  <div class="page">
-    <h2>Lista de Contatos</h2>
+  <div class="card">
 
-      <div class="form">
-    <input v-model="novoNome" placeholder="Nome" />
-  <input v-model="novoEmail" placeholder="Email" />
-    <input v-model="novoPhone" placeholder="Telefone" />
-   <button class="btn"
-  @click="contatoEditando ? atualizarContato() : criarContato()">
-  {{ contatoEditando ? 'Atualizar' : 'Salvar' }}
-</button>
-</div>
+    <h2>Contatos</h2>
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Email</th>
-          <th>Telefone</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="contato in contatos" :key="contato.id">
-        <td>{{ contato.name }}</td>
-        <td>{{ contato.email }}</td>
-        <td>{{ contato.phone }}</td>
-        <td>
-            <button @click="editarContato(contato)" class="edit">Editar</button>
-            <button @click="deletarContato(contato.id)" class="delete">Excluir</button>
-        </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="p-fluid grid mb-3">
+      <div class="col-4">
+        <InputText v-model="novoNome" placeholder="Nome" />
+      </div>
+
+      <div class="col-4">
+        <InputText v-model="novoEmail" placeholder="Email" />
+      </div>
+
+      <div class="col-4">
+        <InputText v-model="novoPhone" placeholder="Telefone" />
+      </div>
+
+      <div class="col-12 mt-2">
+        <Button
+  :label="editandoId ? 'Atualizar' : 'Salvar'"
+  :icon="editandoId ? 'pi pi-check' : 'pi pi-plus'"
+  @click="criarContato"
+/>
+      </div>
+    </div>
+
+    <DataTable :value="contatos">
+
+      <Column field="name" header="Nome"></Column>
+
+      <Column field="email" header="Email"></Column>
+
+      <Column field="phone" header="Telefone"></Column>
+
+      <Column header="Ações">
+        <template #body="slotProps">
+
+          <Button
+            icon="pi pi-pencil"
+            severity="warning"
+            rounded
+            class="mr-2"
+            @click="editarContato(slotProps.data)"
+          />
+
+          <Button
+            icon="pi pi-trash"
+            severity="danger"
+            rounded
+            @click="deletarContato(slotProps.data.id)"
+          />
+
+        </template>
+      </Column>
+
+    </DataTable>
+
   </div>
 </template>
-
 <style scoped>
-.page-header {
-  margin-bottom: 20px;
+
+.page{
+  background: linear-gradient(135deg,#f6f9fc,#e9eff5);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-.form {
-  margin-bottom: 20px;
-  display: flex;
-  gap: 10px;
+.container{
+  background:white;
+  padding:40px;
+  border-radius:16px;
+  width:900px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
 }
 
-.form input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+.titulo{
+  text-align:center;
+  margin-bottom:30px;
+  font-weight:600;
 }
 
-.btn {
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.btn:hover{
-  background-color:#092664;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  margin-right: 5px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
+.formulario{
+  margin-bottom:30px;
 }
 
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
+.p-inputtext{
+  width:100%;
 }
 
-.table th,
-.table td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: left;
-}
-.edit {
-  background-color: #f59e0b;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  margin-right: 5px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
+.p-button{
+  margin-top:10px;
 }
 
-.edit:hover {
-  background-color: #d97706;
-}
-
-.delete {
-  background-color: #ef4444;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.delete:hover {
-  background-color: #dc2626;
-}
 </style>
