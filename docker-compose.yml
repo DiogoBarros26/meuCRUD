@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+
+  # ── Banco de dados ────────────────────────────────────────────────────────────
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: agenda_sqlserver
+    environment:
+      SA_PASSWORD: "SuaSenhaForte@123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "SuaSenhaForte@123", "-Q", "SELECT 1"]
+      interval: 10s
+      retries: 10
+      start_period: 30s
+
+  # ── Backend ASP.NET Core ──────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: AgendaCrud_1.Dockerfile
+    container_name: agenda_backend
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=AgendaDB;User Id=sa;Password=SuaSenhaForte@123;TrustServerCertificate=True;"
+      ASPNETCORE_ENVIRONMENT: "Development"
+    ports:
+      - "5000:5000"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  # ── Frontend Vue.js ───────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: agenda-front.Dockerfile
+    container_name: agenda_frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  sqlserver_data:

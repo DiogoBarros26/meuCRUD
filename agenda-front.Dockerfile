@@ -1,0 +1,26 @@
+# ─── Stage 1: Build ───────────────────────────────────────────────────────────
+FROM node:20-alpine AS build
+WORKDIR /app
+
+COPY agenda-front/package*.json ./
+RUN npm install
+
+COPY agenda-front/. .
+RUN npm run build
+
+# ─── Stage 2: Serve com Nginx ─────────────────────────────────────────────────
+FROM nginx:alpine AS runtime
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Configuração para suportar Vue Router no modo history
+RUN echo 'server { \
+    listen 80; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    location / { \
+        try_files $uri $uri/ /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
