@@ -1,4 +1,4 @@
-# 📋 AgendaCRUD
+#  AgendaCRUD
 
 CRUD de agenda de contatos desenvolvido como teste técnico para processo seletivo de estágio.
 
