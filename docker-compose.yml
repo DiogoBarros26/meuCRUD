@@ -28,6 +28,7 @@ services:
     environment:
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=AgendaDB;User Id=sa;Password=SuaSenhaForte@123;TrustServerCertificate=True;"
       ASPNETCORE_ENVIRONMENT: "Development"
+      CORS_ORIGIN: "http://localhost:8080"
     ports:
       - "5000:5000"
     depends_on:
