@@ -2,6 +2,8 @@
 
 CRUD de agenda de contatos desenvolvido como teste técnico para processo seletivo de estágio.
 
+> *Projeto entregue como teste técnico em mar/2026 e mantido como foi enviado, para registrar meu ponto de partida.*
+
 ##  Tecnologias
 
 | Camada     | Tecnologia                   |
